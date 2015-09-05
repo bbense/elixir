@@ -2565,6 +2565,15 @@ defmodule Kernel do
     :lists.foldl fn {x, pos}, acc -> Macro.pipe(acc, x, pos) end, h, t
   end
 
+  defmacro left <|> right do
+    quote do
+      case unquote(left) do
+        {:ok, value} -> value |> unquote(right)
+        {not_ok, excuse} -> raise RuntimeError, "Left side of <|> returned {#{Macro.to_string(not_ok)}, #{Macro.to_string(excuse)}}"
+      end
+    end
+  end
+
   @doc """
   Returns `true` if `module` is loaded and contains a
   public `function` with the given `arity`, otherwise `false`.
